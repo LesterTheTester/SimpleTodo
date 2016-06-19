@@ -27,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         lvItems = (ListView)findViewById(R.id.lvItems);
         items = new ArrayList<>();
-        items.add("First Item");  // These are just defaults if nothing has been read from disk
-        items.add("Second Item");
         readItems();
+        if (items.isEmpty()) { // Add some defaults if nothing has been read from disk
+            items.add("First Item");
+            items.add("Second Item");
+        }
         itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
         setupListViewListener();
