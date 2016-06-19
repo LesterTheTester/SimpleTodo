@@ -1,5 +1,6 @@
 package com.codepath.simpletodo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
+    private final int EDIT_REQUEST_CODE = 13;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         lvItems = (ListView)findViewById(R.id.lvItems);
         items = new ArrayList<>();
-        items.add("First Item");
+        items.add("First Item");  // These are just defaults if nothing has been read from disk
         items.add("Second Item");
         readItems();
         itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
@@ -53,6 +55,29 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+        lvItems.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
+                        Intent editItem = new Intent(MainActivity.this, EditItemActivity.class);
+                        String text = items.get(pos);
+                        editItem.putExtra("pos", pos);
+                        editItem.putExtra("text", text);
+                        startActivityForResult(editItem, EDIT_REQUEST_CODE);
+                    }
+                }
+        );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
+            String text = data.getStringExtra("text");
+            int pos = data.getIntExtra("pos", -1);
+            items.set(pos, text);
+            itemsAdapter.notifyDataSetChanged();
+            writeItems();
+        }
     }
 
     private void readItems(){
